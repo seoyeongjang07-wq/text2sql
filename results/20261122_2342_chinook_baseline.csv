@@ -1,0 +1,80 @@
+﻿id,level,question,correct,sql,pred_sql,error
+1,easy,아티스트는 모두 몇 명이야?,True,SELECT COUNT(*) FROM Artist,SELECT COUNT(*) AS artist_count FROM Artist,
+2,easy,고객은 모두 몇 명이야?,True,SELECT COUNT(*) FROM Customer,SELECT COUNT(*) AS customer_count FROM Customer,
+3,easy,재생 시간이 가장 긴 곡 5개의 이름을 알려줘,True,SELECT Name FROM Track ORDER BY Milliseconds DESC LIMIT 5,SELECT Name FROM Track ORDER BY Milliseconds DESC LIMIT 5,
+4,easy,브라질에 사는 고객들의 이름과 성을 보여줘,True,"SELECT FirstName, LastName FROM Customer WHERE Country = 'Brazil'","SELECT FirstName, LastName FROM Customer WHERE Country = 'Brazil'",
+5,easy,장르는 몇 개 있어?,True,SELECT COUNT(*) FROM Genre,SELECT COUNT(*) AS genre_count FROM Genre,
+6,easy,곡 하나의 평균 가격은 얼마야?,True,SELECT AVG(UnitPrice) FROM Track,"SELECT ROUND(AVG(UnitPrice), 2) AS AveragePrice FROM Track",
+7,easy,"직원들의 이름, 성, 직책을 보여줘",True,"SELECT FirstName, LastName, Title FROM Employee","SELECT FirstName, LastName, Title FROM Employee",
+8,easy,금액이 가장 큰 송장(Invoice) 1건의 번호와 금액은?,True,"SELECT InvoiceId, Total FROM Invoice ORDER BY Total DESC LIMIT 1","SELECT InvoiceId, Total FROM Invoice ORDER BY Total DESC LIMIT 1",
+9,easy,작곡가(Composer) 정보가 없는 곡은 몇 개야?,True,SELECT COUNT(*) FROM Track WHERE Composer IS NULL,"SELECT COUNT(*) AS track_count
+FROM Track
+WHERE Composer IS NULL OR TRIM(Composer) = ''",
+10,easy,고객이 있는 나라는 몇 개국이야?,True,SELECT COUNT(DISTINCT Country) FROM Customer,SELECT COUNT(DISTINCT Country) AS CountryCount FROM Customer WHERE Country IS NOT NULL,
+11,medium,장르별 곡 수를 보여줘,True,"SELECT g.Name, COUNT(*) FROM Track t JOIN Genre g ON t.GenreId = g.GenreId GROUP BY g.GenreId","SELECT g.Name AS GenreName, COUNT(t.TrackId) AS TrackCount
+FROM Genre g
+LEFT JOIN Track t ON g.GenreId = t.GenreId
+GROUP BY g.GenreId, g.Name
+ORDER BY TrackCount DESC",
+12,medium,나라별 총 매출 상위 5개국과 매출액은?,True,"SELECT BillingCountry, SUM(Total) AS revenue FROM Invoice GROUP BY BillingCountry ORDER BY revenue DESC LIMIT 5","SELECT BillingCountry AS Country, ROUND(SUM(Total), 2) AS TotalSales FROM Invoice GROUP BY BillingCountry ORDER BY TotalSales DESC LIMIT 5",
+13,medium,앨범 수가 가장 많은 아티스트 3명과 앨범 수는?,True,"SELECT ar.Name, COUNT(*) AS n FROM Album al JOIN Artist ar ON al.ArtistId = ar.ArtistId GROUP BY ar.ArtistId ORDER BY n DESC LIMIT 3","SELECT ar.Name, COUNT(al.AlbumId) AS AlbumCount
+FROM Artist ar
+JOIN Album al ON ar.ArtistId = al.ArtistId
+GROUP BY ar.ArtistId, ar.Name
+ORDER BY AlbumCount DESC
+LIMIT 3",
+14,medium,미디어 타입별 곡 수를 보여줘,True,"SELECT m.Name, COUNT(*) FROM Track t JOIN MediaType m ON t.MediaTypeId = m.MediaTypeId GROUP BY m.MediaTypeId","SELECT mt.Name AS MediaType, COUNT(t.TrackId) AS TrackCount FROM MediaType mt LEFT JOIN Track t ON mt.MediaTypeId = t.MediaTypeId GROUP BY mt.MediaTypeId, mt.Name",
+15,medium,연도별 총 매출을 보여줘,True,"SELECT strftime('%Y', InvoiceDate) AS year, SUM(Total) FROM Invoice GROUP BY year","SELECT strftime('%Y', InvoiceDate) AS Year, ROUND(SUM(Total), 2) AS TotalSales FROM Invoice GROUP BY Year ORDER BY Year",
+16,medium,'Grunge' 플레이리스트에는 곡이 몇 개 들어 있어?,True,SELECT COUNT(*) FROM PlaylistTrack pt JOIN Playlist p ON pt.PlaylistId = p.PlaylistId WHERE p.Name = 'Grunge',SELECT COUNT(pt.TrackId) AS track_count FROM PlaylistTrack pt JOIN Playlist p ON pt.PlaylistId = p.PlaylistId WHERE p.Name = 'Grunge',
+17,medium,'AC/DC'의 앨범 제목을 모두 보여줘,True,SELECT al.Title FROM Album al JOIN Artist ar ON al.ArtistId = ar.ArtistId WHERE ar.Name = 'AC/DC',SELECT Album.Title FROM Album JOIN Artist ON Album.ArtistId = Artist.ArtistId WHERE Artist.Name = 'AC/DC',
+18,medium,장르별 곡의 평균 재생 시간(분)이 가장 긴 장르 3개는?,True,"SELECT g.Name, AVG(t.Milliseconds) / 60000.0 AS avg_min FROM Track t JOIN Genre g ON t.GenreId = g.GenreId GROUP BY g.GenreId ORDER BY avg_min DESC LIMIT 3","SELECT g.Name AS GenreName, AVG(t.Milliseconds) / 60000.0 AS AvgMinutes FROM Track t JOIN Genre g ON t.GenreId = g.GenreId GROUP BY g.GenreId, g.Name ORDER BY AvgMinutes DESC LIMIT 3",
+19,medium,도시별 고객 수가 2명 이상인 도시와 고객 수는?,True,"SELECT City, COUNT(*) FROM Customer GROUP BY City HAVING COUNT(*) >= 2","SELECT City, COUNT(*) AS CustomerCount FROM Customer GROUP BY City HAVING COUNT(*) >= 2",
+20,medium,"총 구매 금액이 가장 큰 고객 5명의 이름, 성, 총액은?",True,"SELECT c.FirstName, c.LastName, SUM(i.Total) AS spent FROM Invoice i JOIN Customer c ON i.CustomerId = c.CustomerId GROUP BY c.CustomerId ORDER BY spent DESC LIMIT 5","SELECT c.FirstName, c.LastName, SUM(i.Total) AS TotalAmount FROM Customer c JOIN Invoice i ON c.CustomerId = i.CustomerId GROUP BY c.CustomerId, c.FirstName, c.LastName ORDER BY TotalAmount DESC LIMIT 5",
+21,hard,가장 많이 팔린 아티스트 Top 5와 판매된 곡 수는?,False,"SELECT ar.Name, SUM(il.Quantity) AS sold FROM InvoiceLine il JOIN Track t ON il.TrackId = t.TrackId JOIN Album al ON t.AlbumId = al.AlbumId JOIN Artist ar ON al.ArtistId = ar.ArtistId GROUP BY ar.ArtistId ORDER BY sold DESC LIMIT 5","SELECT ar.ArtistId, ar.Name, SUM(il.Quantity) AS TotalSold
+FROM InvoiceLine il
+JOIN Track t ON il.TrackId = t.TrackId
+JOIN Album al ON t.AlbumId = al.AlbumId
+JOIN Artist ar ON al.ArtistId = ar.ArtistId
+GROUP BY ar.ArtistId, ar.Name
+ORDER BY TotalSold DESC
+LIMIT 5",
+22,hard,매출(판매 금액) 기준 상위 3개 장르와 매출액은?,True,"SELECT g.Name, SUM(il.UnitPrice * il.Quantity) AS revenue FROM InvoiceLine il JOIN Track t ON il.TrackId = t.TrackId JOIN Genre g ON t.GenreId = g.GenreId GROUP BY g.GenreId ORDER BY revenue DESC LIMIT 3","SELECT g.Name AS Genre, ROUND(SUM(il.UnitPrice * il.Quantity), 2) AS Revenue
+FROM InvoiceLine il
+JOIN Track t ON il.TrackId = t.TrackId
+JOIN Genre g ON t.GenreId = g.GenreId
+GROUP BY g.GenreId, g.Name
+ORDER BY Revenue DESC
+LIMIT 3",
+23,hard,"담당 고객들의 총 매출이 가장 큰 영업 직원의 이름, 성, 매출액은?",True,"SELECT e.FirstName, e.LastName, SUM(i.Total) AS revenue FROM Employee e JOIN Customer c ON c.SupportRepId = e.EmployeeId JOIN Invoice i ON i.CustomerId = c.CustomerId GROUP BY e.EmployeeId ORDER BY revenue DESC LIMIT 1","SELECT e.FirstName, e.LastName, SUM(i.Total) AS TotalSales
+FROM Employee e
+JOIN Customer c ON c.SupportRepId = e.EmployeeId
+JOIN Invoice i ON i.CustomerId = c.CustomerId
+GROUP BY e.EmployeeId, e.FirstName, e.LastName
+ORDER BY TotalSales DESC
+LIMIT 1",
+24,hard,한 번도 팔리지 않은 곡은 몇 개야?,True,SELECT COUNT(*) FROM Track WHERE TrackId NOT IN (SELECT TrackId FROM InvoiceLine),SELECT COUNT(*) AS unsold_track_count FROM Track t WHERE NOT EXISTS (SELECT 1 FROM InvoiceLine il WHERE il.TrackId = t.TrackId),
+25,hard,평균 곡 가격보다 비싼 곡은 몇 개야?,True,SELECT COUNT(*) FROM Track WHERE UnitPrice > (SELECT AVG(UnitPrice) FROM Track),SELECT COUNT(*) AS track_count FROM Track WHERE UnitPrice > (SELECT AVG(UnitPrice) FROM Track),
+26,hard,"부하 직원이 있는 직원(상사)의 이름, 성과 부하 직원 수는?",True,"SELECT m.FirstName, m.LastName, COUNT(*) FROM Employee e JOIN Employee m ON e.ReportsTo = m.EmployeeId GROUP BY m.EmployeeId","SELECT m.FirstName, m.LastName, COUNT(e.EmployeeId) AS SubordinateCount FROM Employee m JOIN Employee e ON e.ReportsTo = m.EmployeeId GROUP BY m.EmployeeId, m.FirstName, m.LastName",
+27,hard,"Rock 장르 곡을 가장 많이 구매한 고객 2명의 이름, 성, 구매 곡 수는?",True,"SELECT c.FirstName, c.LastName, SUM(il.Quantity) AS n FROM InvoiceLine il JOIN Invoice i ON il.InvoiceId = i.InvoiceId JOIN Customer c ON i.CustomerId = c.CustomerId JOIN Track t ON il.TrackId = t.TrackId JOIN Genre g ON t.GenreId = g.GenreId WHERE g.Name = 'Rock' GROUP BY c.CustomerId ORDER BY n DESC LIMIT 2","SELECT c.FirstName, c.LastName, SUM(il.Quantity) AS PurchasedTracks
+FROM Customer c
+JOIN Invoice i ON c.CustomerId = i.CustomerId
+JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
+JOIN Track t ON il.TrackId = t.TrackId
+JOIN Genre g ON t.GenreId = g.GenreId
+WHERE g.Name = 'Rock'
+GROUP BY c.CustomerId, c.FirstName, c.LastName
+ORDER BY PurchasedTracks DESC
+LIMIT 2",
+28,hard,고객 수가 가장 많은 나라에서 발생한 총 매출은?,True,SELECT SUM(Total) FROM Invoice WHERE BillingCountry = (SELECT Country FROM Customer GROUP BY Country ORDER BY COUNT(*) DESC LIMIT 1),"SELECT SUM(i.Total) AS TotalRevenue
+FROM Invoice i
+JOIN Customer c ON i.CustomerId = c.CustomerId
+WHERE c.Country = (
+    SELECT Country
+    FROM Customer
+    WHERE Country IS NOT NULL
+    GROUP BY Country
+    ORDER BY COUNT(*) DESC
+    LIMIT 1
+)",
+29,hard,곡이 10개 이상 들어 있는 앨범은 몇 개야?,True,SELECT COUNT(*) FROM (SELECT AlbumId FROM Track GROUP BY AlbumId HAVING COUNT(*) >= 10),SELECT COUNT(*) AS album_count FROM (SELECT AlbumId FROM Track WHERE AlbumId IS NOT NULL GROUP BY AlbumId HAVING COUNT(*) >= 10),
+30,hard,전체 매출에서 미국(USA)이 차지하는 비율(%)은?,True,SELECT 100.0 * SUM(CASE WHEN BillingCountry = 'USA' THEN Total ELSE 0 END) / SUM(Total) FROM Invoice,"SELECT ROUND(100.0 * SUM(CASE WHEN BillingCountry = 'USA' THEN Total ELSE 0 END) / SUM(Total), 2) AS usa_sales_percent FROM Invoice",

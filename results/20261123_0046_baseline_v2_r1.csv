@@ -1,0 +1,208 @@
+﻿id,type,level,question,correct,sql,pred_sql,error
+1,basic,easy,전체 주문은 몇 건이야?,True,SELECT COUNT(*) FROM orders,SELECT COUNT(*) AS total_orders FROM orders,
+2,basic,easy,배송 완료(delivered) 상태인 주문은 몇 건이야?,True,SELECT COUNT(*) FROM orders WHERE order_status = 'delivered',SELECT COUNT(*) AS delivered_order_count FROM orders WHERE order_status = 'delivered',
+3,basic,easy,판매자는 모두 몇 명이야?,True,SELECT COUNT(*) FROM sellers,SELECT COUNT(DISTINCT seller_id) AS seller_count FROM sellers,
+4,basic,easy,리뷰 평점의 평균은?,True,SELECT AVG(review_score) FROM order_reviews,SELECT AVG(review_score) AS avg_review_score FROM order_reviews,
+5,basic,easy,결제 방식(payment_type)별 결제 건수를 보여줘,True,"SELECT payment_type, COUNT(*) FROM order_payments GROUP BY payment_type","SELECT payment_type, COUNT(*) AS payment_count FROM order_payments GROUP BY payment_type",
+6,basic,easy,판매자가 가장 많은 주(state)와 그 판매자 수는?,True,"SELECT seller_state, COUNT(*) AS n FROM sellers GROUP BY seller_state ORDER BY n DESC LIMIT 1","SELECT seller_state, COUNT(*) AS seller_count FROM sellers GROUP BY seller_state ORDER BY seller_count DESC LIMIT 1",
+7,basic,easy,2017년에 구매된 주문은 몇 건이야?,True,"SELECT COUNT(*) FROM orders WHERE strftime('%Y', order_purchase_timestamp) = '2017'","SELECT COUNT(*) AS order_count FROM orders WHERE strftime('%Y', order_purchase_timestamp) = '2017'",
+8,basic,easy,카테고리 정보가 없는 상품은 몇 개야?,True,SELECT COUNT(*) FROM products WHERE product_category_name IS NULL,SELECT COUNT(*) AS no_category_product_count FROM products WHERE product_category_name IS NULL OR TRIM(product_category_name) = '',
+9,basic,easy,무게가 10kg 이상인 상품은 몇 개야?,True,SELECT COUNT(*) FROM products WHERE product_weight_g >= 10000,SELECT COUNT(*) AS product_count FROM products WHERE product_weight_g >= 10000,
+10,basic,easy,취소(canceled)된 주문의 비율(%)은?,True,SELECT 100.0 * SUM(order_status = 'canceled') / COUNT(*) FROM orders,"SELECT ROUND(100.0 * SUM(CASE WHEN order_status = 'canceled' THEN 1 ELSE 0 END) / COUNT(*), 2) AS canceled_order_percentage FROM orders",
+11,basic,medium,"같은 사람이 여러 번 주문해도 한 명으로 셀 때, 실제 고객은 몇 명이야?",True,SELECT COUNT(DISTINCT customer_unique_id) FROM customers,SELECT COUNT(DISTINCT customer_unique_id) AS unique_customer_count FROM customers,
+12,basic,medium,"영어 카테고리 이름 기준으로, 판매된 상품 수(주문 상품 행 수)가 가장 많은 카테고리 5개와 그 수는?",True,"SELECT t.product_category_name_english, COUNT(*) AS n FROM order_items oi JOIN products p ON oi.product_id = p.product_id JOIN category_translation t ON p.product_category_name = t.product_category_name GROUP BY t.product_category_name_english ORDER BY n DESC LIMIT 5","SELECT ct.product_category_name_english AS category_name, COUNT(*) AS sold_item_count
+FROM order_items oi
+JOIN products p ON oi.product_id = p.product_id
+JOIN category_translation ct ON p.product_category_name = ct.product_category_name
+GROUP BY ct.product_category_name_english
+ORDER BY sold_item_count DESC
+LIMIT 5",
+13,basic,medium,health_beauty 카테고리 상품들의 상품 가격(price) 합계는?,True,SELECT SUM(oi.price) FROM order_items oi JOIN products p ON oi.product_id = p.product_id JOIN category_translation t ON p.product_category_name = t.product_category_name WHERE t.product_category_name_english = 'health_beauty',"SELECT SUM(oi.price) AS total_price
+FROM order_items oi
+JOIN products p ON oi.product_id = p.product_id
+JOIN category_translation ct ON p.product_category_name = ct.product_category_name
+WHERE ct.product_category_name_english = 'health_beauty'",
+14,basic,medium,2018년 월별 주문 건수를 보여줘 (월은 01~12 형식으로),True,"SELECT strftime('%m', order_purchase_timestamp) AS month, COUNT(*) FROM orders WHERE strftime('%Y', order_purchase_timestamp) = '2018' GROUP BY month","SELECT strftime('%m', order_purchase_timestamp) AS month, COUNT(*) AS order_count FROM orders WHERE strftime('%Y', order_purchase_timestamp) = '2018' GROUP BY month ORDER BY month",
+15,basic,medium,결제 금액(payment_value) 합계가 가장 큰 결제 방식과 그 합계는?,True,"SELECT payment_type, SUM(payment_value) AS total FROM order_payments GROUP BY payment_type ORDER BY total DESC LIMIT 1","SELECT payment_type, SUM(payment_value) AS total_payment_value FROM order_payments GROUP BY payment_type ORDER BY total_payment_value DESC LIMIT 1",
+16,basic,medium,리뷰 점수 1점을 받은 주문은 몇 건이야?,True,SELECT COUNT(DISTINCT order_id) FROM order_reviews WHERE review_score = 1,SELECT COUNT(DISTINCT order_id) AS order_count FROM order_reviews WHERE review_score = 1,
+17,basic,medium,판매한 상품 수(주문 상품 행 수)가 가장 많은 판매자 3명의 seller_id와 판매 수는?,True,"SELECT seller_id, COUNT(*) AS n FROM order_items GROUP BY seller_id ORDER BY n DESC LIMIT 3","SELECT seller_id, COUNT(*) AS sales_count
+FROM order_items
+GROUP BY seller_id
+ORDER BY sales_count DESC
+LIMIT 3",
+18,basic,medium,신용카드(credit_card) 결제의 평균 할부 개월 수는?,True,SELECT AVG(payment_installments) FROM order_payments WHERE payment_type = 'credit_card',SELECT AVG(payment_installments) AS avg_installments FROM order_payments WHERE payment_type = 'credit_card',
+19,basic,medium,고객이 사는 주(state)별 평균 배송비(freight_value)가 가장 높은 주 3개와 평균 배송비는?,True,"SELECT c.customer_state, AVG(oi.freight_value) AS avg_f FROM order_items oi JOIN orders o ON oi.order_id = o.order_id JOIN customers c ON o.customer_id = c.customer_id GROUP BY c.customer_state ORDER BY avg_f DESC LIMIT 3","SELECT c.customer_state, AVG(oi.freight_value) AS avg_freight_value
+FROM order_items oi
+JOIN orders o ON oi.order_id = o.order_id
+JOIN customers c ON o.customer_id = c.customer_id
+GROUP BY c.customer_state
+ORDER BY avg_freight_value DESC
+LIMIT 3",
+20,basic,medium,2017년 11월에 구매된 주문들의 상품 가격(price) 합계는?,True,"SELECT SUM(oi.price) FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE strftime('%Y-%m', o.order_purchase_timestamp) = '2017-11'","SELECT SUM(oi.price) AS total_price
+FROM orders o
+JOIN order_items oi ON o.order_id = oi.order_id
+WHERE strftime('%Y-%m', o.order_purchase_timestamp) = '2017-11'",
+21,basic,hard,두 번 이상 주문한 실제 고객(같은 사람은 한 명으로)은 몇 명이야?,True,SELECT COUNT(*) FROM (SELECT c.customer_unique_id FROM orders o JOIN customers c ON o.customer_id = c.customer_id GROUP BY c.customer_unique_id HAVING COUNT(DISTINCT o.order_id) >= 2),"SELECT COUNT(*) AS repeat_customer_count
+FROM (
+    SELECT c.customer_unique_id
+    FROM orders o
+    JOIN customers c ON o.customer_id = c.customer_id
+    GROUP BY c.customer_unique_id
+    HAVING COUNT(DISTINCT o.order_id) >= 2
+)",
+22,basic,hard,실제 고객(같은 사람은 한 명으로) 중 두 번 이상 주문한 고객의 비율(%)은?,True,SELECT 100.0 * (SELECT COUNT(*) FROM (SELECT c.customer_unique_id FROM orders o JOIN customers c ON o.customer_id = c.customer_id GROUP BY c.customer_unique_id HAVING COUNT(DISTINCT o.order_id) >= 2)) / (SELECT COUNT(DISTINCT customer_unique_id) FROM customers),"WITH cust_orders AS (
+    SELECT c.customer_unique_id, COUNT(DISTINCT o.order_id) AS order_cnt
+    FROM customers c
+    JOIN orders o ON c.customer_id = o.customer_id
+    GROUP BY c.customer_unique_id
+)
+SELECT ROUND(100.0 * SUM(CASE WHEN order_cnt >= 2 THEN 1 ELSE 0 END) / COUNT(*), 2) AS repeat_customer_pct
+FROM cust_orders",
+23,basic,hard,배송 완료된 주문 중 예상 배송일보다 늦게 고객에게 도착한 주문의 비율(%)은?,True,SELECT 100.0 * SUM(order_delivered_customer_date > order_estimated_delivery_date) / COUNT(*) FROM orders WHERE order_status = 'delivered' AND order_delivered_customer_date IS NOT NULL,"SELECT ROUND(100.0 * SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) / COUNT(*), 2) AS late_delivery_rate_pct FROM orders WHERE order_status = 'delivered' AND order_delivered_customer_date IS NOT NULL AND order_estimated_delivery_date IS NOT NULL",
+24,basic,hard,"배송 완료된 주문의 평균 배송 기간(구매 시점부터 고객 도착까지, 일 단위)은?",True,SELECT AVG(julianday(order_delivered_customer_date) - julianday(order_purchase_timestamp)) FROM orders WHERE order_status = 'delivered' AND order_delivered_customer_date IS NOT NULL,SELECT AVG(julianday(order_delivered_customer_date) - julianday(order_purchase_timestamp)) AS avg_delivery_days FROM orders WHERE order_status = 'delivered' AND order_delivered_customer_date IS NOT NULL AND order_purchase_timestamp IS NOT NULL,
+25,basic,hard,"결제가 여러 건으로 나뉜 경우 합산했을 때, 결제 총액이 가장 큰 주문의 order_id와 결제 총액은?",True,"SELECT order_id, SUM(payment_value) AS total FROM order_payments GROUP BY order_id ORDER BY total DESC LIMIT 1","SELECT order_id, SUM(payment_value) AS total_payment
+FROM order_payments
+GROUP BY order_id
+ORDER BY total_payment DESC
+LIMIT 1",
+26,basic,hard,"상품이 1개 이상 있는 주문 기준으로, 주문 하나에 평균 몇 개의 상품(주문 상품 행)이 들어 있어?",True,"SELECT AVG(n) FROM (SELECT order_id, COUNT(*) AS n FROM order_items GROUP BY order_id)","SELECT AVG(item_count) AS avg_items_per_order
+FROM (
+    SELECT order_id, COUNT(*) AS item_count
+    FROM order_items
+    GROUP BY order_id
+)",
+27,basic,hard,판매자와 고객이 같은 주(state)에 있는 주문 상품의 비율(%)은?,True,SELECT 100.0 * SUM(s.seller_state = c.customer_state) / COUNT(*) FROM order_items oi JOIN sellers s ON oi.seller_id = s.seller_id JOIN orders o ON oi.order_id = o.order_id JOIN customers c ON o.customer_id = c.customer_id,"SELECT ROUND(100.0 * SUM(CASE WHEN c.customer_state = s.seller_state THEN 1 ELSE 0 END) / COUNT(*), 2) AS same_state_ratio_pct FROM order_items oi JOIN orders o ON oi.order_id = o.order_id JOIN customers c ON o.customer_id = c.customer_id JOIN sellers s ON oi.seller_id = s.seller_id",
+28,basic,hard,"상품 가격(price) 합계가 가장 큰 판매자의 seller_id와, 그 판매자가 판매한 서로 다른 카테고리 수는?",True,"SELECT oi.seller_id, COUNT(DISTINCT p.product_category_name) FROM order_items oi JOIN products p ON oi.product_id = p.product_id WHERE oi.seller_id = (SELECT seller_id FROM order_items GROUP BY seller_id ORDER BY SUM(price) DESC LIMIT 1) GROUP BY oi.seller_id","WITH top_seller AS (
+    SELECT seller_id
+    FROM order_items
+    GROUP BY seller_id
+    ORDER BY SUM(price) DESC
+    LIMIT 1
+)
+SELECT oi.seller_id,
+       COUNT(DISTINCT p.product_category_name) AS category_count
+FROM order_items oi
+JOIN top_seller ts ON oi.seller_id = ts.seller_id
+JOIN products p ON p.product_id = oi.product_id
+GROUP BY oi.seller_id",
+29,basic,hard,"주문이 1,000건 이상인 영어 카테고리 중 평균 리뷰 점수가 가장 낮은 카테고리의 이름만 알려줘",True,"SELECT t.product_category_name_english FROM (SELECT DISTINCT oi.order_id, p.product_category_name FROM order_items oi JOIN products p ON oi.product_id = p.product_id) x JOIN category_translation t ON x.product_category_name = t.product_category_name JOIN order_reviews r ON r.order_id = x.order_id GROUP BY t.product_category_name_english HAVING COUNT(DISTINCT x.order_id) >= 1000 ORDER BY AVG(r.review_score) ASC LIMIT 1","SELECT t.product_category_name_english
+FROM order_items oi
+JOIN orders o ON oi.order_id = o.order_id
+JOIN products p ON oi.product_id = p.product_id
+JOIN category_translation t ON p.product_category_name = t.product_category_name
+LEFT JOIN order_reviews r ON o.order_id = r.order_id
+GROUP BY t.product_category_name_english
+HAVING COUNT(DISTINCT o.order_id) >= 1000
+ORDER BY AVG(r.review_score) ASC
+LIMIT 1",
+30,basic,hard,2018년 1월부터 8월까지 월별 주문 건수와 1월부터의 누적 주문 건수를 보여줘 (월은 01~12 형식으로),True,"SELECT month, n, SUM(n) OVER (ORDER BY month) FROM (SELECT strftime('%m', order_purchase_timestamp) AS month, COUNT(*) AS n FROM orders WHERE order_purchase_timestamp >= '2018-01-01' AND order_purchase_timestamp < '2018-09-01' GROUP BY month)","WITH monthly AS (
+    SELECT strftime('%m', order_purchase_timestamp) AS month,
+           COUNT(*) AS order_count
+    FROM orders
+    WHERE strftime('%Y-%m', order_purchase_timestamp) BETWEEN '2018-01' AND '2018-08'
+    GROUP BY strftime('%m', order_purchase_timestamp)
+)
+SELECT month,
+       order_count,
+       SUM(order_count) OVER (ORDER BY month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative_order_count
+FROM monthly
+ORDER BY month",
+31,glossary,medium,2018년 GMV는?,False,"SELECT SUM(oi.price + oi.freight_value) FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE o.order_status = 'delivered' AND strftime('%Y', o.order_purchase_timestamp) = '2018'","SELECT ROUND(SUM(oi.price + oi.freight_value), 2) AS gmv_2018
+FROM orders o
+JOIN order_items oi ON o.order_id = oi.order_id
+WHERE strftime('%Y', o.order_purchase_timestamp) = '2018'
+  AND o.order_status <> 'canceled'",
+32,glossary,medium,2017년 순매출은?,False,"SELECT SUM(oi.price) FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE o.order_status = 'delivered' AND strftime('%Y', o.order_purchase_timestamp) = '2017'","SELECT ROUND(SUM(oi.price), 2) AS net_revenue_2017
+FROM order_items oi
+JOIN orders o ON oi.order_id = o.order_id
+WHERE o.order_status <> 'canceled'
+  AND strftime('%Y', o.order_purchase_timestamp) = '2017'",
+33,glossary,hard,2018년 8월 객단가는?,False,"SELECT SUM(oi.price + oi.freight_value) / COUNT(DISTINCT o.order_id) FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE o.order_status = 'delivered' AND strftime('%Y-%m', o.order_purchase_timestamp) = '2018-08'","SELECT SUM(p.payment_value) * 1.0 / COUNT(DISTINCT o.order_id) AS 객단가
+FROM orders o
+JOIN order_payments p ON o.order_id = p.order_id
+WHERE strftime('%Y-%m', o.order_purchase_timestamp) = '2018-08'",
+34,glossary,medium,활성 판매자는 몇 명이야?,False,"SELECT COUNT(DISTINCT oi.seller_id) FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE o.order_status NOT IN ('canceled', 'unavailable') AND o.order_purchase_timestamp >= '2018-06-01' AND o.order_purchase_timestamp < '2018-09-01'",SELECT COUNT(DISTINCT seller_id) AS active_seller_count FROM order_items,
+35,glossary,medium,불만 리뷰는 몇 건이야?,True,SELECT COUNT(*) FROM order_reviews WHERE review_score <= 2,SELECT COUNT(*) AS complaint_review_count FROM order_reviews WHERE review_score <= 2,
+36,glossary,medium,리뷰 순추천 지수는?,False,SELECT 100.0 * (SUM(review_score >= 4) - SUM(review_score <= 2)) / COUNT(*) FROM order_reviews,"SELECT ROUND(
+    (SUM(CASE WHEN review_score = 5 THEN 1 ELSE 0 END) - SUM(CASE WHEN review_score <= 3 THEN 1 ELSE 0 END)) * 100.0 / COUNT(*),
+    2
+) AS nps
+FROM order_reviews
+WHERE review_score IS NOT NULL",
+37,glossary,medium,지연 배송 비율(%)은?,False,SELECT 100.0 * SUM(date(order_delivered_customer_date) > date(order_estimated_delivery_date)) / COUNT(*) FROM orders WHERE order_status = 'delivered' AND order_delivered_customer_date IS NOT NULL,"SELECT ROUND(100.0 * SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) / COUNT(*), 2) AS delay_rate_pct FROM orders WHERE order_status = 'delivered' AND order_delivered_customer_date IS NOT NULL AND order_estimated_delivery_date IS NOT NULL",
+38,glossary,medium,재구매 고객은 몇 명이야?,False,"SELECT COUNT(*) FROM (SELECT c.customer_unique_id FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE o.order_status NOT IN ('canceled', 'unavailable') GROUP BY c.customer_unique_id HAVING COUNT(DISTINCT o.order_id) >= 2)","SELECT COUNT(*) AS repeat_customer_count
+FROM (
+    SELECT c.customer_unique_id
+    FROM orders o
+    JOIN customers c ON o.customer_id = c.customer_id
+    GROUP BY c.customer_unique_id
+    HAVING COUNT(DISTINCT o.order_id) > 1
+)",
+39,glossary,hard,VIP 고객은 몇 명이야?,False,"SELECT COUNT(*) FROM (SELECT c.customer_unique_id FROM order_payments p JOIN orders o ON p.order_id = o.order_id JOIN customers c ON o.customer_id = c.customer_id WHERE o.order_status NOT IN ('canceled', 'unavailable') GROUP BY c.customer_unique_id HAVING SUM(p.payment_value) >= 1000)","-- VIP 고객: 누적 결제금액 1,000 이상인 고유 고객(customer_unique_id) 수
+SELECT COUNT(*) AS vip_customer_count
+FROM (
+    SELECT c.customer_unique_id
+    FROM customers c
+    JOIN orders o ON o.customer_id = c.customer_id
+    JOIN order_payments p ON p.order_id = o.order_id
+    GROUP BY c.customer_unique_id
+    HAVING SUM(p.payment_value) >= 1000
+) AS vip",SELECT가 아닌 쿼리
+40,glossary,medium,대형 상품은 몇 개야?,False,"SELECT COUNT(*) FROM products WHERE product_weight_g >= 10000 OR max(product_length_cm, product_width_cm, product_height_cm) >= 100","SELECT COUNT(*) AS large_product_count
+FROM products
+WHERE product_length_cm * product_width_cm * product_height_cm >= 30000",
+41,glossary,hard,핵심 지역 고객의 2018년 GMV는?,False,"SELECT SUM(oi.price + oi.freight_value) FROM order_items oi JOIN orders o ON oi.order_id = o.order_id JOIN customers c ON o.customer_id = c.customer_id WHERE o.order_status = 'delivered' AND strftime('%Y', o.order_purchase_timestamp) = '2018' AND c.customer_state IN ('SP', 'RJ', 'MG')","SELECT SUM(oi.price) AS gmv_2018
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+JOIN order_items oi ON o.order_id = oi.order_id
+WHERE c.customer_state = 'SP'
+  AND strftime('%Y', o.order_purchase_timestamp) = '2018'",
+42,glossary,medium,할부 결제 비율(%)은?,False,SELECT 100.0 * SUM(payment_installments >= 2) / COUNT(*) FROM order_payments WHERE payment_type = 'credit_card',"SELECT ROUND(100.0 * SUM(CASE WHEN payment_installments > 1 THEN 1 ELSE 0 END) / COUNT(*), 2) AS installment_payment_ratio_pct FROM order_payments",
+43,glossary,medium,평균 배송 리드타임(일)은?,False,SELECT AVG(julianday(order_delivered_customer_date) - julianday(order_delivered_carrier_date)) FROM orders WHERE order_status = 'delivered' AND order_delivered_carrier_date IS NOT NULL AND order_delivered_customer_date IS NOT NULL,SELECT AVG(julianday(order_delivered_customer_date) - julianday(order_purchase_timestamp)) AS avg_delivery_lead_time_days FROM orders WHERE order_status = 'delivered' AND order_delivered_customer_date IS NOT NULL AND order_purchase_timestamp IS NOT NULL,
+44,glossary,hard,2018년 GMV가 가장 큰 카테고리 3개의 이름만 알려줘,True,"SELECT t.product_category_name_english FROM order_items oi JOIN orders o ON oi.order_id = o.order_id JOIN products p ON oi.product_id = p.product_id JOIN category_translation t ON p.product_category_name = t.product_category_name WHERE o.order_status = 'delivered' AND strftime('%Y', o.order_purchase_timestamp) = '2018' GROUP BY t.product_category_name_english ORDER BY SUM(oi.price + oi.freight_value) DESC LIMIT 3","SELECT COALESCE(t.product_category_name_english, p.product_category_name) AS category_name
+FROM order_items oi
+JOIN orders o ON oi.order_id = o.order_id
+JOIN products p ON oi.product_id = p.product_id
+LEFT JOIN category_translation t ON p.product_category_name = t.product_category_name
+WHERE strftime('%Y', o.order_purchase_timestamp) = '2018'
+GROUP BY category_name
+ORDER BY SUM(oi.price + oi.freight_value) DESC
+LIMIT 3",
+45,glossary,medium,불만 리뷰 비율(%)은?,True,SELECT 100.0 * SUM(review_score <= 2) / COUNT(*) FROM order_reviews,"SELECT ROUND(100.0 * SUM(CASE WHEN review_score <= 2 THEN 1 ELSE 0 END) / COUNT(review_score), 2) AS complaint_review_ratio_pct FROM order_reviews",
+46,glossary,medium,최근 3개월 동안의 유효 주문은 몇 건이야?,False,"SELECT COUNT(*) FROM orders o WHERE o.order_status NOT IN ('canceled', 'unavailable') AND o.order_purchase_timestamp >= '2018-06-01' AND o.order_purchase_timestamp < '2018-09-01'","SELECT COUNT(*) AS valid_order_count
+FROM orders
+WHERE order_status NOT IN ('canceled', 'unavailable')
+  AND date(order_purchase_timestamp) >= date((SELECT MAX(date(order_purchase_timestamp)) FROM orders), '-3 months')",
+47,glossary,hard,지연 배송된 주문에 달린 리뷰 중 불만 리뷰의 비율(%)은?,False,SELECT 100.0 * SUM(r.review_score <= 2) / COUNT(*) FROM order_reviews r JOIN orders o ON r.order_id = o.order_id WHERE o.order_status = 'delivered' AND o.order_delivered_customer_date IS NOT NULL AND date(o.order_delivered_customer_date) > date(o.order_estimated_delivery_date),"SELECT ROUND(100.0 * SUM(CASE WHEN r.review_score <= 2 THEN 1 ELSE 0 END) / COUNT(*), 2) AS complaint_review_ratio_pct
+FROM orders o
+JOIN order_reviews r ON o.order_id = r.order_id
+WHERE o.order_delivered_customer_date IS NOT NULL
+  AND o.order_estimated_delivery_date IS NOT NULL
+  AND o.order_delivered_customer_date > o.order_estimated_delivery_date",
+48,glossary,hard,우수 판매자는 몇 명이야?,False,SELECT COUNT(*) FROM (SELECT oi.seller_id FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE o.order_status = 'delivered' AND o.order_purchase_timestamp >= '2018-06-01' AND o.order_purchase_timestamp < '2018-09-01' GROUP BY oi.seller_id HAVING SUM(oi.price + oi.freight_value) >= 10000),"SELECT COUNT(*) AS 우수_판매자_수
+FROM (
+    SELECT oi.seller_id
+    FROM order_items oi
+    JOIN order_reviews r ON oi.order_id = r.order_id
+    GROUP BY oi.seller_id
+    HAVING COUNT(DISTINCT r.review_id) >= 10
+       AND AVG(r.review_score) >= 4.5
+)",
+49,glossary,hard,최근 3개월 GMV는?,False,SELECT SUM(oi.price + oi.freight_value) FROM order_items oi JOIN orders o ON oi.order_id = o.order_id WHERE o.order_status = 'delivered' AND o.order_purchase_timestamp >= '2018-06-01' AND o.order_purchase_timestamp < '2018-09-01',"SELECT ROUND(SUM(oi.price + oi.freight_value), 2) AS gmv
+FROM order_items oi
+JOIN orders o ON oi.order_id = o.order_id
+WHERE o.order_status <> 'canceled'
+  AND o.order_purchase_timestamp >= datetime((SELECT MAX(order_purchase_timestamp) FROM orders), '-3 months')
+  AND o.order_purchase_timestamp <= (SELECT MAX(order_purchase_timestamp) FROM orders)",
+50,glossary,hard,재구매 고객들의 GMV 합계는?,False,"SELECT SUM(oi.price + oi.freight_value) FROM order_items oi JOIN orders o ON oi.order_id = o.order_id JOIN customers c ON o.customer_id = c.customer_id WHERE o.order_status = 'delivered' AND c.customer_unique_id IN (SELECT c2.customer_unique_id FROM orders o2 JOIN customers c2 ON o2.customer_id = c2.customer_id WHERE o2.order_status NOT IN ('canceled', 'unavailable') GROUP BY c2.customer_unique_id HAVING COUNT(DISTINCT o2.order_id) >= 2)","WITH repeat_customers AS (
+    SELECT c.customer_unique_id
+    FROM orders o
+    JOIN customers c ON o.customer_id = c.customer_id
+    GROUP BY c.customer_unique_id
+    HAVING COUNT(DISTINCT o.order_id) >= 2
+)
+SELECT ROUND(SUM(oi.price + oi.freight_value), 2) AS repeat_customer_gmv
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+JOIN repeat_customers rc ON c.customer_unique_id = rc.customer_unique_id
+JOIN order_items oi ON o.order_id = oi.order_id",
