@@ -6,7 +6,7 @@ It works on the **Olist** Brazilian e-commerce dataset (~100k orders, 8 tables).
 **Key finding:** Modern LLMs almost never make SQL *syntax* mistakes anymore. What they get wrong are **company-specific terms** such as "GMV" or "repeat customer", whose definitions differ from company to company and do not appear anywhere in the schema.
 A **glossary RAG** that injects only the definitions relevant to each question raised execution accuracy from **67.3% to 99.3%**.
 
-- 🔗 Demo: (link will be added after deployment)
+- 🔗 Live demo: olist-text2sql.streamlit.app (try the example buttons, then switch the sidebar to "baseline" to see the difference)
 - 🧠 Model: Claude Haiku (Anthropic API)
 - 🛠 Stack: Python, SQLite, pandas, Streamlit
 
